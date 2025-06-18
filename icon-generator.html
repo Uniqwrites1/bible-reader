@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PWA Icon Generator</title>
+</head>
+<body>
+    <h1>PWA Icons Generator</h1>
+    <p>Right-click on each canvas and "Save image as..." to save the icons.</p>
+    
+    <h2>192x192 Icon</h2>
+    <canvas id="icon192" width="192" height="192"></canvas>
+    
+    <h2>512x512 Icon</h2>
+    <canvas id="icon512" width="512" height="512"></canvas>
+    
+    <h2>Apple Touch Icon (180x180)</h2>
+    <canvas id="appleIcon" width="180" height="180"></canvas>
+
+    <script>
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            
+            // Background
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, size, size);
+            
+            // Bible book
+            const bookWidth = size * 0.65;
+            const bookHeight = size * 0.55;
+            const bookX = (size - bookWidth) / 2;
+            const bookY = (size - bookHeight) / 2;
+            
+            // Book cover
+            ctx.fillStyle = '#8B4513';
+            ctx.fillRect(bookX, bookY, bookWidth, bookHeight);
+            
+            // Book pages
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(bookX + size * 0.02, bookY + size * 0.02, bookWidth - size * 0.04, bookHeight - size * 0.04);
+            
+            // Golden cross
+            ctx.fillStyle = '#FFD700';
+            const crossSize = size * 0.2;
+            const crossX = size / 2 - crossSize / 6;
+            const crossY = size / 2 - crossSize / 2;
+            
+            // Vertical bar
+            ctx.fillRect(crossX, crossY, crossSize / 3, crossSize);
+            // Horizontal bar
+            ctx.fillRect(crossX - crossSize / 6, crossY + crossSize / 3, crossSize * 0.65, crossSize / 3);
+            
+            // Text
+            ctx.fillStyle = '#FFD700';
+            ctx.font = `bold ${size * 0.08}px serif`;
+            ctx.textAlign = 'center';
+            ctx.fillText('BIBLE', size / 2, bookY + bookHeight + size * 0.08);
+        }
+        
+        // Generate icons
+        drawIcon(document.getElementById('icon192'), 192);
+        drawIcon(document.getElementById('icon512'), 512);
+        drawIcon(document.getElementById('appleIcon'), 180);
+    </script>
+</body>
+</html>

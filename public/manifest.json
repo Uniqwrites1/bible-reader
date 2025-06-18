@@ -1,0 +1,56 @@
+{
+  "name": "Bible Study Plan App",
+  "short_name": "Bible Study",
+  "description": "A comprehensive Bible study planning and reading application with offline support",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#FFD700",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "categories": ["books", "education", "lifestyle"],
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },    {
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512", 
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Bible Reader",
+      "short_name": "Reader",
+      "description": "Read Bible passages",
+      "url": "/bible-reader",
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "My Plans",
+      "short_name": "Plans",
+      "description": "View your reading plans",
+      "url": "/plans",
+      "icons": [
+        {
+          "src": "/pwa-192x192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}
