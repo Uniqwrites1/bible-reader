@@ -38,12 +38,11 @@ const BibleReader: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
-  
-  // Reading settings
+    // Reading settings
   const [fontSize, setFontSize] = useState(16);
   const [fontFamily, setFontFamily] = useState('serif');
   const [lineHeight, setLineHeight] = useState(1.6);
-  const [selectedVersion, setSelectedVersion] = useState('BSB');
+  const [selectedVersion, setSelectedVersion] = useState('eng_kjv');
   
   // Current passage
   const currentBook = searchParams.get('book') || 'Genesis';
