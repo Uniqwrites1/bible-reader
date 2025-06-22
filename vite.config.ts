@@ -47,7 +47,7 @@ export default defineConfig({
               cacheName: 'bible-api-cache',
               expiration: {
                 maxEntries: 500,
-                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                maxAge: 60 * 60 * 24 * 30 // 30 days
               }
             }
           }
@@ -55,4 +55,29 @@ export default defineConfig({
       }
     })
   ],
+  // Ensure API files are included in the build
+  publicDir: 'public',
+  build: {
+    // Copy API folder to dist
+    rollupOptions: {
+      input: {
+        main: './index.html'
+      }
+    },
+    assetsDir: 'assets',
+    outDir: 'dist',
+    // Ensure all assets are included
+    copyPublicDir: true
+  },
+  // Development server configuration
+  server: {
+    fs: {
+      allow: ['..']
+    }
+  },
+  // Preview server configuration (for testing production build locally)
+  preview: {
+    port: 4173,
+    host: true
+  }
 })
