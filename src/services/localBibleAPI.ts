@@ -100,7 +100,18 @@ class LocalBibleAPIService {
       if (response.ok) {
         const translations = await response.json();
         if (translations && translations.length > 0) {
-          return translations;
+          // Make sure compatibility with old format while supporting new enhanced format
+          return translations.map((translation: any) => ({
+            id: translation.id,
+            name: translation.name,
+            abbreviation: translation.abbreviation,
+            language: translation.language,
+            translation_philosophy: translation.translation_philosophy,
+            features: translation.features,
+            availability: translation.availability,
+            quality: translation.quality,
+            metadata: translation.metadata
+          }));
         }
       }
     } catch (error) {

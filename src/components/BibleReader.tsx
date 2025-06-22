@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { localBibleAPI } from '../services/localBibleAPI';
-import { BIBLE_VERSIONS, BIBLE_BOOKS } from '../data/bibleData';
+import { BIBLE_BOOKS } from '../data/bibleData';
+import type { BibleVersion } from '../types';
+import TranslationSelector from './TranslationSelector';
 
 // Convert BIBLE_BOOKS object to array format for easier iteration
 const BIBLE_BOOKS_ARRAY = Object.entries(BIBLE_BOOKS).map(([name, data]) => ({
@@ -38,7 +40,9 @@ const BibleReader: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSettings, setShowSettings] = useState(false);
-    // Reading settings
+  const [availableVersions, setAvailableVersions] = useState<BibleVersion[]>([]);
+  
+  // Reading settings
   const [fontSize, setFontSize] = useState(16);
   const [fontFamily, setFontFamily] = useState('serif');
   const [lineHeight, setLineHeight] = useState(1.6);
@@ -73,17 +77,30 @@ const BibleReader: React.FC = () => {
       setLoading(false);
     }
   }, [currentBook, currentChapter, selectedVersion]);
-
   useEffect(() => {
     loadBibleText();
   }, [loadBibleText]);
+
+  // Load available versions
+  useEffect(() => {
+    const loadVersions = async () => {
+      try {
+        const versions = await localBibleAPI.getVersions();
+        setAvailableVersions(versions);
+      } catch (err) {
+        console.error('Failed to load Bible versions:', err);
+      }
+    };
+    
+    loadVersions();
+  }, []);
   
   const navigateChapter = (direction: 'prev' | 'next') => {
     if (direction === 'prev' && currentChapter > 1) {
       updateParams({ chapter: (currentChapter - 1).toString() });
     } else if (direction === 'next' && currentChapter < maxChapter) {
       updateParams({ chapter: (currentChapter + 1).toString() });    } else if (direction === 'prev' && currentChapter === 1) {
-      // Navigate to previous book's last chapter
+      // Navigate to earlier book's last chapter
       const currentBookIndex = BIBLE_BOOKS_ARRAY.findIndex(book => book.name === currentBook);
       if (currentBookIndex > 0) {
         const prevBook = BIBLE_BOOKS_ARRAY[currentBookIndex - 1];
@@ -269,25 +286,11 @@ const BibleReader: React.FC = () => {
                 onChange={(e) => setLineHeight(parseFloat(e.target.value))}
                 className="setting-slider"
               />
-            </div>
-            
-            <div className="settings-group">
-              <label>
-                <BookOpen className="icon" />
-                Bible Version
-              </label>
-              <select 
-                value={selectedVersion}
-                onChange={(e) => setSelectedVersion(e.target.value)}
-                className="setting-select"
-              >
-                {BIBLE_VERSIONS.map(version => (
-                  <option key={version.id} value={version.id}>
-                    {version.name} ({version.id})
-                  </option>
-                ))}
-              </select>
-            </div>
+            </div>            <TranslationSelector
+              versions={availableVersions}
+              selectedVersion={selectedVersion}
+              onVersionChange={setSelectedVersion}
+            />
           </div>
         )}
 

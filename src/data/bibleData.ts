@@ -1,4 +1,5 @@
-import type { ReadingSection } from '../types';
+import type { ReadingSection, BibleVersion } from '../types';
+import { localBibleAPI } from '../services/localBibleAPI';
 
 export const BIBLE_SECTIONS: ReadingSection[] = [
   {
@@ -155,3 +156,28 @@ export const BIBLE_VERSIONS = [
   { id: 'hau_bib', name: 'Hausa Bible', abbreviation: 'HAU' },
   { id: 'ibo_bib', name: 'Igbo Bible', abbreviation: 'IBO' }
 ];
+
+// Method to get versions with enhanced metadata from API
+export async function getBibleVersions(): Promise<BibleVersion[]> {
+  try {
+    return await localBibleAPI.getVersions();
+  } catch (error) {
+    console.error('Failed to load Bible versions from API:', error);
+    // Return basic versions as fallback
+    return BIBLE_VERSIONS.map(v => ({ 
+      ...v, 
+      language: v.id.includes('spa_') ? 'es' : 
+                v.id.includes('fra_') ? 'fr' : 
+                v.id.includes('deu_') ? 'de' : 
+                v.id.includes('por_') ? 'pt' : 
+                v.id.includes('rus_') ? 'ru' : 
+                v.id.includes('hin_') ? 'hi' : 
+                v.id.includes('cmn_') ? 'zh' : 
+                v.id.includes('jpn_') ? 'ja' : 
+                v.id.includes('swh_') ? 'sw' : 
+                v.id.includes('yor_') ? 'yo' : 
+                v.id.includes('hau_') ? 'ha' : 
+                v.id.includes('ibo_') ? 'ig' : 'en'
+    }));
+  }
+}

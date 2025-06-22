@@ -4,6 +4,21 @@ export interface BibleVersion {
   name: string;
   abbreviation: string;
   language: string;
+  translation_philosophy?: string;
+  features?: string[];
+  availability?: {
+    format: string;
+    status: string;
+  };
+  quality?: {
+    accuracy: string;
+    readability: string;
+  };
+  metadata?: {
+    translator?: string;
+    revision?: string;
+    notes?: string;
+  };
 }
 
 export interface BibleBook {
