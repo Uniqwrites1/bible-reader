@@ -14,7 +14,6 @@ const PWAInstallPrompt: React.FC = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
-
   useEffect(() => {
     // Check if app is already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
@@ -26,22 +25,44 @@ const PWAInstallPrompt: React.FC = () => {
       return;
     }
 
+    // Check if running on HTTPS (required for PWA in production)
+    const isSecure = location.protocol === 'https:' || location.hostname === 'localhost';
+    if (!isSecure) {
+      console.warn('PWA install prompt requires HTTPS in production');
+      return;
+    }
+
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('beforeinstallprompt event fired');
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       
       // Don't show immediately, wait a bit for user to engage
       setTimeout(() => {
         const hasBeenDismissed = localStorage.getItem('pwa-install-dismissed');
-        if (!hasBeenDismissed) {
+        const dismissedTime = localStorage.getItem('pwa-install-dismissed-time');
+        
+        // Reset dismissal after 7 days
+        if (hasBeenDismissed && dismissedTime) {
+          const dismissedDate = new Date(dismissedTime);
+          const daysSinceDismissed = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
+          if (daysSinceDismissed > 7) {
+            localStorage.removeItem('pwa-install-dismissed');
+            localStorage.removeItem('pwa-install-dismissed-time');
+          }
+        }
+        
+        if (!localStorage.getItem('pwa-install-dismissed')) {
+          console.log('Showing PWA install prompt');
           setShowPrompt(true);
         }
-      }, 10000); // Show after 10 seconds
+      }, 5000); // Reduced to 5 seconds for better UX
     };
 
     // Listen for successful installation
     const handleAppInstalled = () => {
+      console.log('App installed successfully');
       setIsInstalled(true);
       setShowPrompt(false);
       setDeferredPrompt(null);
@@ -49,6 +70,13 @@ const PWAInstallPrompt: React.FC = () => {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
+
+    // For debugging - check if the event would fire
+    setTimeout(() => {
+      if (!deferredPrompt) {
+        console.log('beforeinstallprompt event has not fired after 3 seconds');
+      }
+    }, 3000);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -75,10 +103,10 @@ const PWAInstallPrompt: React.FC = () => {
     setDeferredPrompt(null);
     setShowPrompt(false);
   };
-
   const handleDismiss = () => {
     setShowPrompt(false);
     localStorage.setItem('pwa-install-dismissed', 'true');
+    localStorage.setItem('pwa-install-dismissed-time', new Date().toISOString());
   };
 
   if (isInstalled || !showPrompt || !deferredPrompt) {
