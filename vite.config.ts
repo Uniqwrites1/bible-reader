@@ -47,7 +47,7 @@ export default defineConfig({
               cacheName: 'bible-api-cache',
               expiration: {
                 maxEntries: 500,
-                maxAge: 60 * 60 * 24 * 30 // 30 days
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
               }
             }
           }
