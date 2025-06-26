@@ -15,26 +15,43 @@ const PWAInstallPrompt: React.FC = () => {
   const [showPrompt, setShowPrompt] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   useEffect(() => {
+    console.log('PWAInstallPrompt: Component mounted');
+    console.log('PWAInstallPrompt: Location:', window.location.href);
+    console.log('PWAInstallPrompt: Protocol:', window.location.protocol);
+    console.log('PWAInstallPrompt: User Agent:', navigator.userAgent);
+    
     // Check if app is already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     const isInWebAppiOS = (window.navigator as any).standalone === true;
     const isInWebAppChrome = window.matchMedia('(display-mode: standalone)').matches;
     
+    console.log('PWAInstallPrompt: isStandalone:', isStandalone);
+    console.log('PWAInstallPrompt: isInWebAppiOS:', isInWebAppiOS);
+    console.log('PWAInstallPrompt: isInWebAppChrome:', isInWebAppChrome);
+    
     if (isStandalone || isInWebAppiOS || isInWebAppChrome) {
+      console.log('PWAInstallPrompt: App already installed, hiding prompt');
       setIsInstalled(true);
       return;
     }
 
     // Check if running on HTTPS (required for PWA in production)
     const isSecure = location.protocol === 'https:' || location.hostname === 'localhost';
+    console.log('PWAInstallPrompt: isSecure:', isSecure);
     if (!isSecure) {
       console.warn('PWA install prompt requires HTTPS in production');
       return;
     }
 
+    // Check localStorage status
+    const hasBeenDismissed = localStorage.getItem('pwa-install-dismissed');
+    const dismissedTime = localStorage.getItem('pwa-install-dismissed-time');
+    console.log('PWAInstallPrompt: hasBeenDismissed:', hasBeenDismissed);
+    console.log('PWAInstallPrompt: dismissedTime:', dismissedTime);
+
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
-      console.log('beforeinstallprompt event fired');
+      console.log('PWAInstallPrompt: beforeinstallprompt event fired!');
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       
@@ -47,38 +64,52 @@ const PWAInstallPrompt: React.FC = () => {
         if (hasBeenDismissed && dismissedTime) {
           const dismissedDate = new Date(dismissedTime);
           const daysSinceDismissed = (Date.now() - dismissedDate.getTime()) / (1000 * 60 * 60 * 24);
+          console.log('PWAInstallPrompt: daysSinceDismissed:', daysSinceDismissed);
           if (daysSinceDismissed > 7) {
             localStorage.removeItem('pwa-install-dismissed');
             localStorage.removeItem('pwa-install-dismissed-time');
+            console.log('PWAInstallPrompt: Dismissal reset after 7 days');
           }
         }
         
         if (!localStorage.getItem('pwa-install-dismissed')) {
-          console.log('Showing PWA install prompt');
+          console.log('PWAInstallPrompt: Showing install prompt');
           setShowPrompt(true);
+        } else {
+          console.log('PWAInstallPrompt: Prompt was previously dismissed');
         }
-      }, 5000); // Reduced to 5 seconds for better UX
+      }, 3000); // Reduced to 3 seconds for debugging
     };
 
     // Listen for successful installation
     const handleAppInstalled = () => {
-      console.log('App installed successfully');
+      console.log('PWAInstallPrompt: App installed successfully');
       setIsInstalled(true);
       setShowPrompt(false);
       setDeferredPrompt(null);
     };
 
+    // Add event listeners
+    console.log('PWAInstallPrompt: Adding event listeners');
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleAppInstalled);
 
     // For debugging - check if the event would fire
     setTimeout(() => {
+      console.log('PWAInstallPrompt: Checking after 5 seconds...');
+      console.log('PWAInstallPrompt: deferredPrompt exists:', !!deferredPrompt);
       if (!deferredPrompt) {
-        console.log('beforeinstallprompt event has not fired after 3 seconds');
+        console.log('PWAInstallPrompt: beforeinstallprompt event has not fired after 5 seconds');
+        console.log('PWAInstallPrompt: This could be due to:');
+        console.log('- Browser install criteria not met');
+        console.log('- App already installed');
+        console.log('- User has declined install before');
+        console.log('- Manifest or service worker issues');
       }
-    }, 3000);
+    }, 5000);
 
     return () => {
+      console.log('PWAInstallPrompt: Removing event listeners');
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
@@ -109,7 +140,36 @@ const PWAInstallPrompt: React.FC = () => {
     localStorage.setItem('pwa-install-dismissed-time', new Date().toISOString());
   };
 
+  // Debug function to clear localStorage (for testing)
+  const clearInstallDismissal = () => {
+    localStorage.removeItem('pwa-install-dismissed');
+    localStorage.removeItem('pwa-install-dismissed-time');
+    console.log('PWAInstallPrompt: Cleared dismissal status');
+    // Reload to trigger the prompt check again
+    window.location.reload();
+  };
+
   if (isInstalled || !showPrompt || !deferredPrompt) {
+    // Show debug info in console even when prompt is hidden
+    console.log('PWAInstallPrompt: Not showing prompt because:');
+    console.log('- isInstalled:', isInstalled);
+    console.log('- showPrompt:', showPrompt);
+    console.log('- deferredPrompt exists:', !!deferredPrompt);
+    
+    // Add a debug button in development
+    if (import.meta.env.DEV || window.location.hostname === 'localhost') {
+      return (
+        <div className="fixed bottom-4 right-4 z-50">
+          <button
+            onClick={clearInstallDismissal}
+            className="bg-red-500 text-white px-2 py-1 rounded text-xs"
+          >
+            Clear PWA Dismiss
+          </button>
+        </div>
+      );
+    }
+    
     return null;
   }
 
