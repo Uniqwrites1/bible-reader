@@ -4,17 +4,12 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: './',
+  base: '/',
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'icon.svg'],
-      injectRegister: 'auto',
-      devOptions: {
-        enabled: true,
-        type: 'module'
-      },
       manifest: {
         name: 'Bible Study Plan App',
         short_name: 'Bible Study',
@@ -22,25 +17,25 @@ export default defineConfig({
         theme_color: '#FFD700',
         background_color: '#000000',
         display: 'standalone',
-        scope: './',
-        start_url: './',
+        scope: '/',
+        start_url: '/',
         orientation: 'portrait',
         categories: ['education', 'books', 'reference'],
         icons: [
           {
-            src: './pwa-192x192.png',
+            src: '/pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: './pwa-512x512.png',
+            src: '/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: './pwa-512x512.png',
+            src: '/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable'
@@ -55,7 +50,7 @@ export default defineConfig({
         skipWaiting: true,
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/bible-reader-alpha\.vercel\.app\/api\/.*/i,
+            urlPattern: /^\/api\/.*/i,
             handler: 'CacheFirst',
             options: {
               cacheName: 'bible-api-cache',

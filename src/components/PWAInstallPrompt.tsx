@@ -23,13 +23,11 @@ const PWAInstallPrompt: React.FC = () => {
     // Check if app is already installed
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     const isInWebAppiOS = (window.navigator as any).standalone === true;
-    const isInWebAppChrome = window.matchMedia('(display-mode: standalone)').matches;
     
     console.log('PWAInstallPrompt: isStandalone:', isStandalone);
     console.log('PWAInstallPrompt: isInWebAppiOS:', isInWebAppiOS);
-    console.log('PWAInstallPrompt: isInWebAppChrome:', isInWebAppChrome);
     
-    if (isStandalone || isInWebAppiOS || isInWebAppChrome) {
+    if (isStandalone || isInWebAppiOS) {
       console.log('PWAInstallPrompt: App already installed, hiding prompt');
       setIsInstalled(true);
       return;
@@ -38,7 +36,7 @@ const PWAInstallPrompt: React.FC = () => {
     // Check if running on HTTPS (required for PWA in production)
     const isSecure = location.protocol === 'https:' || location.hostname === 'localhost';
     console.log('PWAInstallPrompt: isSecure:', isSecure);
-    if (!isSecure) {
+    if (!isSecure && location.hostname !== 'localhost') {
       console.warn('PWA install prompt requires HTTPS in production');
       return;
     }
