@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/',
+  base: './',
   plugins: [
     react(),
     VitePWA({
@@ -22,25 +22,25 @@ export default defineConfig({
         theme_color: '#FFD700',
         background_color: '#000000',
         display: 'standalone',
-        scope: '/',
-        start_url: '/',
+        scope: './',
+        start_url: './',
         orientation: 'portrait',
         categories: ['education', 'books', 'reference'],
         icons: [
           {
-            src: '/pwa-192x192.png',
+            src: './pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: '/pwa-512x512.png',
+            src: './pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: '/pwa-512x512.png',
+            src: './pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable'
@@ -49,8 +49,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
-        globDirectory: 'dist',
-        swDest: 'dist/sw.js',
+        sourcemap: false,
+        cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
         runtimeCaching: [
@@ -110,5 +110,10 @@ export default defineConfig({
   preview: {
     port: 4173,
     host: true
+  },
+  experimental: {
+    renderBuiltUrl(filename: string) {
+      return filename.startsWith('/') ? filename.slice(1) : filename;
+    }
   }
 })

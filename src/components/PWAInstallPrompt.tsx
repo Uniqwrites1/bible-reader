@@ -57,7 +57,6 @@ const PWAInstallPrompt: React.FC = () => {
       setDeferredPrompt(promptEvent);
       
       // Show the prompt immediately in production, with a small delay in dev
-      const showDelay = location.hostname === 'localhost' ? 3000 : 1000;
       setTimeout(() => {
         const hasBeenDismissed = localStorage.getItem('pwa-install-dismissed');
         const dismissedTime = localStorage.getItem('pwa-install-dismissed-time');
