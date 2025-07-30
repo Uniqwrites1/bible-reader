@@ -51,11 +51,13 @@ const PWAInstallPrompt: React.FC = () => {
 
     // Listen for the beforeinstallprompt event
     const handleBeforeInstallPrompt = (e: Event) => {
-      console.log('PWAInstallPrompt: beforeinstallprompt event fired!');
+      console.log('PWAInstallPrompt: beforeinstallprompt event fired!', e);
       e.preventDefault();
-      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      const promptEvent = e as BeforeInstallPromptEvent;
+      setDeferredPrompt(promptEvent);
       
-      // Don't show immediately, wait a bit for user to engage
+      // Show the prompt immediately in production, with a small delay in dev
+      const showDelay = location.hostname === 'localhost' ? 3000 : 1000;
       setTimeout(() => {
         const hasBeenDismissed = localStorage.getItem('pwa-install-dismissed');
         const dismissedTime = localStorage.getItem('pwa-install-dismissed-time');
